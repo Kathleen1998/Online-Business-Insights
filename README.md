@@ -15,7 +15,7 @@ https://public.tableau.com/app/profile/kathleneanderson/viz/RecencyFrequencyMone
 -- -- Customer Insight Dashboard-- --
 
 -- customer segmentation
-	
+```	
 SELECT customerno, DATEDIFF('2020-01-01', MAX(date)) AS recency
 FROM order_info
 GROUP BY customerno;
@@ -83,10 +83,10 @@ SELECT customerno,
        monetary_value,
        recency_score + frequency_score + monetary_score AS rfm_score
 FROM rfm;
-
+```
 
 -- cutomer retention
-
+```
  WITH DateRange AS 
 	(Select customerno,
  min(date) dateMin,
@@ -96,13 +96,14 @@ FROM rfm;
  
 select customerno, datediff(dateMax, dateMin) as HowFrequent
 FROM   DateRange;
-
+```
 
 
 https://public.tableau.com/app/profile/kathleneanderson/viz/ProductAnalysisDashboard_17549601810070/PRODDASH
 
 
 -- product
+```
 select productname , count(productname) as TopPurchased
 from salestransaction
 group by productname
@@ -112,19 +113,22 @@ select productname , sum(amount) as TopRevenue
 from salestransaction
 group by productname
 ORDER BY TopRevenue DESC;
+```
 
 -- return
-
+```
 select productname, count(productname) ReturnedAmount
 from salestransaction
 where quantity <= 0
 group by productname
 order by ReturnedAmount desc;
-
+```
 
 https://public.tableau.com/app/profile/kathleneanderson/viz/OnlineSalesKPIDashboard_17549599787590/KPIDASH
 
 ##KPI------------------------------------------
+
+```
 Select floor(sum(amount)) as TotalRevenueKPI
 from salestransaction;
 
@@ -135,8 +139,10 @@ select productname, sum(quantity) as QuatitySold
 from salestransaction
 group by productname
 order by QuatitySold desc;
+```
 
 ##GEO--------------------------------------------
+```
 select country, floor(sum(amount)) as TotalCountryRev
 from salestransaction
 group by country;
@@ -145,8 +151,10 @@ select country, count(distinct transactionno) as PurchasesPerCon
 from salestransaction
 group by country
 order by PurchasesPerCon desc;
+```
 
 -- Sales Trends 
+```
 Select SUM(Total) AS Dec18
 FROM ecom.order_info
 where date between '2018-12-01' AND '2018-12-31';
@@ -198,35 +206,56 @@ where date between '2019-11-01' AND '2019-11-30';
 Select SUM(Total) AS Dec19
 FROM ecom.order_info
 where date between '2019-12-01' AND '2019-12-31';
-
+```
 
 -- Quarter Decemeber
+
+```
 Select SUM(Total) AS Q0
 FROM ecom.order_info
 where date between '2018-12-01' AND '2018-12-31';
+```
+
 -- Quarter Jan-Mar
+
+```
 Select SUM(Total) AS Q1
 FROM ecom.order_info
 where date between '2019-01-01' AND '2019-03-31';
+```
+
 -- Quarter Apr-Jun
+
+```
 Select SUM(Total) AS Q2
 FROM ecom.order_info
 where date between '2019-04-01' AND '2019-06-30';
+```
+
 -- Quarter Jul-Sep
+
+```
 Select SUM(Total) AS Q3
 FROM ecom.order_info
 where date between '2019-07-01' AND '2019-09-30';
+```
+
 -- Quarter Oct-Dec
+
+```
 Select SUM(Total) AS Q4
 FROM ecom.order_info
 where date between '2019-10-01' AND '2019-12-31';
+```
 
 -- Sales By
+
+```
 select productname , count(productname) as TopSelling
 from salestransaction
 group by productname
 ORDER BY amount DESC;
-
+```
 
 
 
