@@ -1,1 +1,480 @@
 
+-- Creating a new customer table in order to make a primary key
+Create table CustomerInfo AS 
+SELECT distinct customerno, country 
+From ecom.customer;
+
+Select *
+From ecom.CustomerInfo;
+
+Alter Table customerInfo ADD primary key (customerno);
+
+-- The same for Product
+
+Select *
+From  ecom.ProductInfo;
+
+Create table ProductInfo AS 
+SELECT distinct productno, productname 
+From ecom.product;
+
+Alter Table ProductInfo ADD primary key (productno);
+
+-- we got an error saying there was a duplicate
+
+SELECT productno, COUNT(*)
+FROM ProductInfo
+GROUP BY productno
+HAVING COUNT(*) > 1;
+
+UPDATE product
+SET productname = 'Squarecushion Cover Pink Union Jack'
+WHERE productno = '22785';
+
+-- Now order items
+
+select *
+From ecom.orders;
+
+Create table OrderInfo AS
+select distinct transactionno, customerno, date
+From ecom.orders;
+
+Create Table transactionTotals
+SELECT transactionno, SUM(amount) AS Total
+FROM ecom.salestransaction
+GROUP BY transactionno;
+
+select *
+From ecom.transactionTotals;
+
+CREATE TABLE Order_Info AS
+SELECT OrderInfo.transactionno, orderinfo.customerno, orderinfo.date, transactionTotals.Total
+FROM ecom.OrderInfo
+LEFT JOIN transactionTotals ON OrderInfo.transactionno = transactionTotals.transactionno
+ORDER BY OrderInfo.transactionno;
+
+select *
+From ecom.order_info;
+
+Alter Table transactionTotals ADD primary key (transactionno);
+Alter Table OrderInfo ADD primary key (transactionno);
+ALTER TABLE OrderInfo ADD FOREIGN KEY (customerno) REFERENCES customerinfo(customerno);
+-- We have to append the Total Amount onto this table
+
+-- Last but not least order items
+-- OrderItemInfo lol 
+
+select *
+From ecom.order_item;
+
+Alter Table order_item ADD primary key (id);
+
+-- ---------------KEY METRIC CALACULATIONS--------------------------------
+-- Average Order Value (AOV): SUM(TotalAmount) / COUNT(DISTINCT OrderID).
+Select SUM(total) / Count(distinct transactionno) AS orderAverage
+From ecom.order_info;
+
+-- Orders per Customer: Count orders for each unique CustomerID.
+SELECT customerno, count(distinct transactionno) As AmountOfPurchases
+from salestransaction
+group by customerno;
+
+create table ItemsPerCustomer AS
+SELECT customerno, count(productname) AS OrderedItemsPerCustomer
+FROM ecom.salestransaction
+group by customerno;
+
+-- ------------------------------Time-Based Analysis----------------------------------------------
+-- Calculate Monthly/Quarterly/Annual Sales Trends.
+-- Monthly Jan
+Select SUM(Total) AS January2019
+FROM ecom.order_info
+where date between '2019-01-01' AND '2019-01-31';
+
+-- Quarter Jan-Mar
+Select SUM(Total) AS Q0
+FROM ecom.order_info
+where date between '2' AND '2019-03-31';
+-- Quarter Jan-Mar
+Select SUM(Total) AS Q1
+FROM ecom.order_info
+where date between '2019-01-01' AND '2019-03-31';
+-- Quarter Jan-Mar
+Select SUM(Total) AS Q2
+FROM ecom.order_info
+where date between '2019-04-01' AND '2019-06-30';
+-- Quarter Jan-Mar
+Select SUM(Total) AS Q3
+FROM ecom.order_info
+where date between '2019-07-01' AND '2019-09-30';
+-- Quarter Jan-Mar
+Select SUM(Total) AS Q4
+FROM ecom.order_info
+where date between '2019-10-01' AND '2019-12-31';
+
+-- Analyze Sales by Day of Week/Hour of Day to identify peak shopping times (using EXTRACT or DATENAME functions).
+SELECT DAYNAME('2017-06-15');
+
+With DailySales AS(
+SELECT date, DAYNAME(date) AS DayOfTheWeek, Total
+From order_info
+),
+WeekdayTotal AS(
+SELECT DayOfTheWeek, SUM(Total) AS DaysTotal
+FROM DailySales
+group by DayOfTheWeek
+)
+select DayOfTheWeek, DaysTotal
+From WeekdayTotal;
+
+-- top selling items
+select productname , count(productname) as amount
+from salestransaction
+group by productname
+ORDER BY amount DESC;
+
+
+
+-- Intermediate: Calculate Rolling Averages (e.g., 7-day rolling average of total sales) using window functions like AVG() OVER (ORDER BY OrderDate ROWS BETWEEN 6 PRECEDING AND CURRENT ROW).
+SELECT * FROM ecom.order_info;
+
+select row_number () over (order by date rows BETWEEN Current row and 6 Following) AS Weeks,
+avg (Total) Over (order by date rows BETWEEN Current row and 6 Following) AS WeeklyAvg
+From order_info;
+
+SELECT
+    MIN(date) AS WindowStartDate,
+    MAX(date) AS WindowEndDate,
+    SUM(Total) AS TotalSalesInWindow
+FROM (
+    SELECT
+        date,
+        Total,
+        FLOOR(DATEDIFF(date, '2018-12-01') / 7) AS CustomWeekGroup
+    FROM order_info
+) AS SubqueryWithCustomGroups
+GROUP BY CustomWeekGroup
+ORDER BY CustomWeekGroup;
+
+
+-- -----------------------------------------------------------------------------------------------------------------
+-- Recency: Calculate the number of days since each customer's last purchase.
+
+		-- how many customers
+        select count(distinct customerno) As AmountOfCustomers
+        from salestransaction;
+ 
+ Select customerno, (min(date) - max(date)) AS PurchaseDifferece
+ from salestransaction
+ group by customerno
+ order by date;
+		-- this can tell me how long they been a customer
+ Select customerno,
+ min(date) dateMin,
+ max(date) dateMax
+ From salestransaction
+ group by customerno;
+ 
+ 
+ -- i want to see beween their first and second visit// average the date between the first and last vist bc i cant do this
+ WITH DateRange AS 
+	(Select customerno,
+ min(date) dateMin,
+ max(date) dateMax
+ From salestransaction
+ group by customerno)
+ 
+select customerno, datediff(dateMax, dateMin) as HowFrequent
+FROM   DateRange;
+        
+-- Frequency: Count the total number of orders for each customer.
+select customerno, count(distinct transactionno) AS TotalTransactions
+from order_info
+Group by customerno;
+
+
+-- Monetary: Sum the total money spent by each customer.
+select customerno, floor(sum(total)) as TotalSpending
+from order_info
+Group by customerno;
+
+-- Intermediate: Use MAX(OrderDate) for recency and COUNT(DISTINCT OrderID) for frequency, 
+--  then join with SUM(TotalAmount). You can then use CASE statements or subqueries to assign 
+--   RFM segments (e.g., 'High Value', 'Loyal', 'At Risk').
+-- https://datatas.com/how-to-create-rfm-segmentation-with-sql/
+SELECT * FROM ecom.order_info;
+
+SELECT customerno,
+       DATEDIFF('2020-01-01', MAX(date)) AS recency
+FROM order_info
+GROUP BY customerno;
+
+SELECT customerno,
+       COUNT(*) AS frequency
+FROM order_info
+GROUP BY customerno;
+
+select customerno, floor(sum(total)) as monetary_value
+from order_info
+Group by customerno;
+
+SELECT r.customerno,
+       r.recency,
+       f.frequency,
+       m.monetary_value
+FROM (SELECT customerno,
+             DATEDIFF('2020-01-01', MAX(date)) AS recency
+      FROM order_info
+      GROUP BY customerno) AS r
+JOIN (SELECT customerno,
+             COUNT(*) AS frequency
+      FROM order_info
+      GROUP BY customerno) AS f
+ON r.customerno = f.customerno
+JOIN (SELECT customerno,
+             SUM(total) AS monetary_value
+      FROM order_info
+      GROUP BY customerno) AS m
+ON r.customerno = m.customerno;
+
+							-- The important stuff--
+SELECT * FROM ecom.salestransaction;
+
+-- KPIS
+Select floor(sum(amount)) as TotalRevenueKPI
+from salestransaction;
+
+SELECT COUNT(distinct Transactionno) as TotalOrdersKPI
+FROM salestransaction;
+
+Select FLOOR(SUM(total) / Count(distinct transactionno)) AS OrderAverageKPI
+From ecom.order_info;
+
+select COUNT(distinct customerno) as TotalCustomers
+FROM salestransaction;
+
+select productname, sum(quantity) as QuatitySold
+from salestransaction
+group by productname
+order by QuatitySold desc;
+
+
+
+-- Sales Trends 
+Select SUM(Total) AS Dec18
+FROM ecom.order_info
+where date between '2018-12-01' AND '2018-12-31';
+-- 
+Select SUM(Total) AS Jan19
+FROM ecom.order_info
+where date between '2019-01-01' AND '2019-01-31';
+
+Select SUM(Total) AS Feb19
+FROM ecom.order_info
+where date between '2019-02-01' AND '2019-02-28';
+
+Select SUM(Total) AS Mar19
+FROM ecom.order_info
+where date between '2019-03-01' AND '2019-03-31';
+
+Select SUM(Total) AS Apr19
+FROM ecom.order_info
+where date between '2019-04-01' AND '2019-04-30';
+
+Select SUM(Total) AS May19
+FROM ecom.order_info
+where date between '2019-05-01' AND '2019-05-31';
+
+Select SUM(Total) AS Jun19
+FROM ecom.order_info
+where date between '2019-06-01' AND '2019-06-30';
+
+Select SUM(Total) AS Jul19
+FROM ecom.order_info
+where date between '2019-07-01' AND '2019-07-31';
+
+Select SUM(Total) AS Aug19
+FROM ecom.order_info
+where date between '2019-08-01' AND '2019-08-31';
+
+Select SUM(Total) AS Sep19
+FROM ecom.order_info
+where date between '2019-09-01' AND '2019-09-30';
+
+Select SUM(Total) AS Oct19
+FROM ecom.order_info
+where date between '2019-10-01' AND '2019-10-30';
+
+Select SUM(Total) AS Nov19
+FROM ecom.order_info
+where date between '2019-11-01' AND '2019-11-30';
+
+Select SUM(Total) AS Dec19
+FROM ecom.order_info
+where date between '2019-12-01' AND '2019-12-31';
+
+
+-- Quarter Decemeber
+Select SUM(Total) AS Q0
+FROM ecom.order_info
+where date between '2018-12-01' AND '2018-12-31';
+-- Quarter Jan-Mar
+Select SUM(Total) AS Q1
+FROM ecom.order_info
+where date between '2019-01-01' AND '2019-03-31';
+-- Quarter Apr-Jun
+Select SUM(Total) AS Q2
+FROM ecom.order_info
+where date between '2019-04-01' AND '2019-06-30';
+-- Quarter Jul-Sep
+Select SUM(Total) AS Q3
+FROM ecom.order_info
+where date between '2019-07-01' AND '2019-09-30';
+-- Quarter Oct-Dec
+Select SUM(Total) AS Q4
+FROM ecom.order_info
+where date between '2019-10-01' AND '2019-12-31';
+
+-- Analyze Sales by Day of Week/Hour of Day to identify peak shopping times (using EXTRACT or DATENAME functions).
+SELECT DAYNAME('2017-06-15');
+
+With DailySales AS(
+SELECT date, DAYNAME(date) AS DayOfTheWeek, Total
+From order_info
+),
+WeekdayTotal AS(
+SELECT DayOfTheWeek, SUM(Total) AS DaysTotal
+FROM DailySales
+group by DayOfTheWeek
+)
+select DayOfTheWeek, DaysTotal
+From WeekdayTotal;
+
+-- Sales By
+select productname , count(productname) as TopSelling
+from salestransaction
+group by productname
+ORDER BY amount DESC;
+
+-- Geospatial 
+
+
+select country, floor(sum(amount)) as TotalCountryRev
+from salestransaction
+group by country;
+
+select country, count(distinct transactionno) as PurchasesPerCon
+from salestransaction
+group by country
+order by PurchasesPerCon desc;
+
+
+-- -- Customer Insight Dashboard-- --
+
+-- customer segmentation
+	
+SELECT customerno, DATEDIFF('2020-01-01', MAX(date)) AS recency
+FROM order_info
+GROUP BY customerno;
+
+SELECT customerno,
+       COUNT(*) AS frequency
+FROM order_info
+GROUP BY customerno;
+
+select customerno, floor(sum(total)) as monetary_value
+from order_info
+Group by customerno;
+
+SELECT r.customerno,
+       r.recency,
+       f.frequency,
+       m.monetary_value
+FROM (SELECT customerno,
+             DATEDIFF('2020-01-01', MAX(date)) AS recency
+      FROM order_info
+      GROUP BY customerno) AS r
+JOIN (SELECT customerno,
+             COUNT(*) AS frequency
+      FROM order_info
+      GROUP BY customerno) AS f
+ON r.customerno = f.customerno
+JOIN (SELECT customerno,
+             SUM(total) AS monetary_value
+      FROM order_info
+      GROUP BY customerno) AS m
+ON r.customerno = m.customerno;
+
+WITH rfm AS (
+    SELECT customerno,
+           recency,
+           frequency,
+           monetary_value,
+           NTILE(5) OVER(ORDER BY recency) AS recency_score,
+           NTILE(5) OVER(ORDER BY frequency DESC) AS frequency_score,
+           NTILE(5) OVER(ORDER BY monetary_value DESC) AS monetary_score
+    FROM (
+        SELECT r.customerno,
+               r.recency,
+               f.frequency,
+               m.monetary_value
+        FROM (SELECT customerno,
+                     DATEDIFF(CURRENT_DATE, MAX(date)) AS recency
+              FROM order_info
+              GROUP BY customerno) AS r
+        JOIN (SELECT customerno,
+                     COUNT(*) AS frequency
+              FROM order_info
+              GROUP BY customerno) AS f
+        ON r.customerno = f.customerno
+        JOIN (SELECT customerno,
+                     SUM(total) AS monetary_value
+              FROM order_info
+              GROUP BY customerno) AS m
+        ON r.customerno = m.customerno
+    ) AS rfm_data
+)
+SELECT customerno,
+       recency,
+       frequency,
+       monetary_value,
+       recency_score + frequency_score + monetary_score AS rfm_score
+FROM rfm;
+
+
+-- cutomer retention
+
+ WITH DateRange AS 
+	(Select customerno,
+ min(date) dateMin,
+ max(date) dateMax
+ From salestransaction
+ group by customerno)
+ 
+select customerno, datediff(dateMax, dateMin) as HowFrequent
+FROM   DateRange;
+
+
+-- product preformance
+
+-- product
+select productname , count(productname) as TopPurchased
+from salestransaction
+group by productname
+ORDER BY TopPurchased DESC;
+
+select productname , sum(productname) as TopRevenue
+from salestransaction
+group by productname
+ORDER BY TopRevenue DESC;
+
+-- return
+
+select productname, count(productname) ReturnedAmount
+from salestransaction
+where quantity <= 0
+group by productname
+order by ReturnedAmount desc;
+
+
