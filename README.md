@@ -12,3 +12,14 @@ Results and Insights: What did the queries reveal? Include screenshots of the ou
 
 
 
+https://public.tableau.com/app/profile/kathleneanderson/viz/RecencyFrequencyMonetaryDashboard/CUSDASH
+
+
+
+
+https://public.tableau.com/app/profile/kathleneanderson/viz/ProductAnalysisDashboard_17549601810070/PRODDASH
+
+
+
+
+https://public.tableau.com/app/profile/kathleneanderson/viz/OnlineSalesKPIDashboard_17549599787590/KPIDASH
