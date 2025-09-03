@@ -10,6 +10,7 @@ Results and Insights: What did the queries reveal? Include screenshots of the ou
 
 
 
+
 https://public.tableau.com/app/profile/kathleneanderson/viz/RecencyFrequencyMonetaryDashboard/CUSDASH
 
 -- -- Customer Insight Dashboard-- --
@@ -123,8 +124,45 @@ where quantity <= 0
 group by productname
 order by ReturnedAmount desc;
 ```
+<img width="1285" height="1025" alt="image" src="https://github.com/user-attachments/assets/71aa44ad-1004-474f-ab0d-7359e4850879" /> 
 
 https://public.tableau.com/app/profile/kathleneanderson/viz/OnlineSalesKPIDashboard_17549599787590/KPIDASH
+
+
+KPI:
+The map shows the range of revenue per country. There was a very vast difference between countries due to England being the country with the highest revenue with over 49 million dollars. Countries like the United States, Canada, Brazil and eastern countries like South Africa and Saudi Arabia bring in anywhere from 5-30 thousand. 
+
+With the countries that aren't pulling in as much revenue, focusing on which countries to extra advertisements and even some first time customers discounts can help. 
+
+Revenue history whether you look at the monthly, weekly or quarterly history there is an overall upward trend. There does seem to be a decline during the month of December which is to be expected right after the holiday shopping.
+
+The company can always do an after christmas sales to help the revenue not drop so drastically.Other than so, The online store is on a relative upward rise throughout the year
+
+Top Sales 
+Popcorn Holder and World War 2 gliders asstd design being the top selling products, with sales over 500 thousand. The top 15 products brought over at least 200 thousand. 
+
+Just like Amazon it might be helpful to do some yearly major sales which help customers eyeing these products to buy even more in bunches.
+
+
+PRODUCT:
+
+Top products
+Just like the top sales both Popcorn holder and World war 2 with world war 2 trinket with over 54 thousand units and popcorn holders with over 56 thousand units. 
+
+To help the other products sell more in quantity, they can 
+
+Returns
+Travel card wallets were seen to be the most returned item. The returns are from different transactions from different customers. 
+
+This dataset did not provide the reason as to why these items were returned. The Travel Cards being the highest returned can mean the company may have to pull the item off the shelves and send surveys to understand why this was returned to either find a new supplier for a relatively similar product or try to fix the issue themselves
+
+
+CUSTOMER
+Recency Frequency Monetary 
+The company has over 4,739 customers, measured from December 01 2018 to December 09 2019. 
+ 
+Over 1520 customers ((32.07%) ) fall in our occasional Buyers group, which is the company's biggest group percentage. These types of customers have a recency (how recent purchases are (me or days since last purchase or last order)made) of 154 which is about 5 months between. A With a purchase averaging to 3,800. FREQUENCY  of purchases or count of transactions
+With an increase of 3.5x from what they’ve done in the 4th quarter of 2018 to to the 4th quarter of 2019.
 
 ##KPI------------------------------------------
 
