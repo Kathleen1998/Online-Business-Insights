@@ -8,10 +8,17 @@ https://www.kaggle.com/datasets/carrie1/ecommerce-data
 Comments: Use comments within your code to explain what each part of the query does (e.g., explaining a complex JOIN, a CTE, or a window function). This shows you can write clean, understandable code.
 Results and Insights: What did the queries reveal? Include screenshots of the output or link to the resulting data visualizations.
 
+<img width="1285" height="1026" alt="image" src="https://github.com/user-attachments/assets/cc8fa4f6-f645-4b7d-a16c-d93ae327fc2e" />
+(https://public.tableau.com/app/profile/kathleneanderson/viz/OnlineSalesKPIDashboard_17549599787590/KPIDASH)
 
+KPI
+The map highlights a significant revenue disparity across countries. The United Kingdom stands out with the highest revenue, exceeding $49 million, while other major countries like the United States, Canada, Brazil, and regions such as South Africa and Saudi Arabia generated a much smaller revenue, ranging from $5,000 to $30,000.
 
+To address the low revenue from these countries, a targeted marketing strategy is recommended. This could involve focused advertising campaigns and offering first-time customer discounts to help boost sales and increase market penetration.
 
-https://public.tableau.com/app/profile/kathleneanderson/viz/RecencyFrequencyMonetaryDashboard/CUSDASH
+An analysis of the company's revenue history shows a consistent upward trend across monthly, weekly, and quarterly data. The only noticeable decline occurs in December, which is likely a post-holiday shopping effect.
+
+ To mitigate the December revenue drop, the company could introduce a post-Christmas sales event. Aside from this seasonal dip, the online store is on a positive growth path.
 
 -- -- Customer Insight Dashboard-- --
 
@@ -99,9 +106,22 @@ select customerno, datediff(dateMax, dateMin) as HowFrequent
 FROM   DateRange;
 ```
 
+<img width="1280" height="1008" alt="image" src="https://github.com/user-attachments/assets/270fadd4-f0cb-4dc6-9fd3-29a85506ed64" />
 
-https://public.tableau.com/app/profile/kathleneanderson/viz/ProductAnalysisDashboard_17549601810070/PRODDASH
+(https://public.tableau.com/app/profile/kathleneanderson/viz/ProductAnalysisDashboard_17549601810070/PRODDASH)
 
+TOP SALES
+Our analysis shows that popcorn holders and the World War 2 gliders were the leading products, with sales surpassing $500,000. Overall, the top 15 products each brought in more than $200,000.
+
+Just like Amazon's yearly sales events, implementing a major sale could incentivize customers who are considering these products to buy in bundles, increasing overall sales volume.
+
+TOP PRODUCT
+In terms of units sold, the same products led the way. The World War 2 trinkets sold over 54,000 units, while popcorn holders sold more than 56,000 units.
+
+RETURN
+The most returned item was the travel card wallet, with returns coming from various transactions and customers. This suggests a widespread issue rather than an isolated incident.
+
+The high return rate for the travel card wallets indicates a potential quality control or design issue. We recommend temporarily pulling this product from shelves and conducting a customer survey to determine the root cause. This will inform a decision on whether to find a new supplier or address the issue internally.
 
 -- product
 ```
@@ -126,43 +146,18 @@ order by ReturnedAmount desc;
 ```
 <img width="1285" height="1025" alt="image" src="https://github.com/user-attachments/assets/71aa44ad-1004-474f-ab0d-7359e4850879" /> 
 
-https://public.tableau.com/app/profile/kathleneanderson/viz/OnlineSalesKPIDashboard_17549599787590/KPIDASH
-
-
-KPI:
-The map shows the range of revenue per country. There was a very vast difference between countries due to England being the country with the highest revenue with over 49 million dollars. Countries like the United States, Canada, Brazil and eastern countries like South Africa and Saudi Arabia bring in anywhere from 5-30 thousand. 
-
-With the countries that aren't pulling in as much revenue, focusing on which countries to extra advertisements and even some first time customers discounts can help. 
-
-Revenue history whether you look at the monthly, weekly or quarterly history there is an overall upward trend. There does seem to be a decline during the month of December which is to be expected right after the holiday shopping.
-
-The company can always do an after christmas sales to help the revenue not drop so drastically.Other than so, The online store is on a relative upward rise throughout the year
-
-Top Sales 
-Popcorn Holder and World War 2 gliders asstd design being the top selling products, with sales over 500 thousand. The top 15 products brought over at least 200 thousand. 
-
-Just like Amazon it might be helpful to do some yearly major sales which help customers eyeing these products to buy even more in bunches.
-
-
-PRODUCT:
-
-Top products
-Just like the top sales both Popcorn holder and World war 2 with world war 2 trinket with over 54 thousand units and popcorn holders with over 56 thousand units. 
-
-To help the other products sell more in quantity, they can 
-
-Returns
-Travel card wallets were seen to be the most returned item. The returns are from different transactions from different customers. 
-
-This dataset did not provide the reason as to why these items were returned. The Travel Cards being the highest returned can mean the company may have to pull the item off the shelves and send surveys to understand why this was returned to either find a new supplier for a relatively similar product or try to fix the issue themselves
-
+(https://public.tableau.com/app/profile/kathleneanderson/viz/RecencyFrequencyMonetaryDashboard/CUSDASH)
 
 CUSTOMER
-Recency Frequency Monetary 
-The company has over 4,739 customers, measured from December 01 2018 to December 09 2019. 
- 
-Over 1520 customers ((32.07%) ) fall in our occasional Buyers group, which is the company's biggest group percentage. These types of customers have a recency (how recent purchases are (me or days since last purchase or last order)made) of 154 which is about 5 months between. A With a purchase averaging to 3,800. FREQUENCY  of purchases or count of transactions
-With an increase of 3.5x from what they’ve done in the 4th quarter of 2018 to to the 4th quarter of 2019.
+From December 2018 to December 2019, the company served over 4,739 customers. The largest segment of our customer base, representing over 32% of customers, falls into the Occasional Buyers group.
+
+Occasional Buyers have a purchase recency of approximately 154 days (or about 5 months) and make an average of 2 purchases. Their average spending is $3,000, and we saw their spending increase by 3.5x from Q4 2018 to Q4 2019.
+
+
+ The Loyal Customer group consists of 644 individuals, representing 13.6% of our customer base. These are our most valuable customers, with a purchase recency of just 46.7 days and an average of 9.27 purchases per year. They spend over $19,100 annually, and their numbers have grown steadily each quarter.
+To further nurture this key segment, we can implement new loyalty programs. Offering special discounts and codes will help us retain these customers and increase their already-significant spending over time.
+
+
 
 ##KPI------------------------------------------
 
