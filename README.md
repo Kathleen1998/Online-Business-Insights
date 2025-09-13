@@ -25,16 +25,7 @@ An analysis of the company's revenue history shows a consistent upward trend acr
 SELECT customerno, DATEDIFF('2020-01-01', MAX(date)) AS recency
 FROM order_info
 GROUP BY customerno;
-
-SELECT customerno,
-       COUNT(*) AS frequency
-FROM order_info
-GROUP BY customerno;
-
-select customerno, floor(sum(total)) as monetary_value
-from order_info
-Group by customerno;
-
+-- Calculating customer's most recent purchase with the perspective that January 1st 2020 is the current date. The results in the recency coloum are in days
 SELECT r.customerno,
        r.recency,
        f.frequency,
@@ -42,17 +33,17 @@ SELECT r.customerno,
 FROM (SELECT customerno,
              DATEDIFF('2020-01-01', MAX(date)) AS recency
       FROM order_info
-      GROUP BY customerno) AS r
+      GROUP BY customerno) AS r -- Calculating customer's most recent purchase with the perspective that January 1st 2020 is the current date. The results in the recency coloum are in days
 JOIN (SELECT customerno,
              COUNT(*) AS frequency
       FROM order_info
       GROUP BY customerno) AS f
-ON r.customerno = f.customerno
+ON r.customerno = f.customerno --  Calculating how many times a customer makes a purchase The results in the frequency coloum are in amount
 JOIN (SELECT customerno,
              SUM(total) AS monetary_value
       FROM order_info
       GROUP BY customerno) AS m
-ON r.customerno = m.customerno;
+ON r.customerno = m.customerno; --Calculating how much a customer's spend on avg per purchase
 
 WITH rfm AS (
     SELECT customerno,
@@ -61,7 +52,7 @@ WITH rfm AS (
            monetary_value,
            NTILE(5) OVER(ORDER BY recency) AS recency_score,
            NTILE(5) OVER(ORDER BY frequency DESC) AS frequency_score,
-           NTILE(5) OVER(ORDER BY monetary_value DESC) AS monetary_score
+           NTILE(5) OVER(ORDER BY monetary_value DESC) AS monetary_score 
     FROM (
         SELECT r.customerno,
                r.recency,
@@ -88,21 +79,12 @@ SELECT customerno,
        frequency,
        monetary_value,
        recency_score + frequency_score + monetary_score AS rfm_score
-FROM rfm;
+FROM rfm; 
+
+--                          
 ```
 
--- cutomer retention
-```
- WITH DateRange AS 
-	(Select customerno,
- min(date) dateMin,
- max(date) dateMax
- From salestransaction
- group by customerno)
- 
-select customerno, datediff(dateMax, dateMin) as HowFrequent
-FROM   DateRange;
-```
+
 
 <img width="1280" height="1008" alt="image" src="https://github.com/user-attachments/assets/270fadd4-f0cb-4dc6-9fd3-29a85506ed64" />
 
@@ -121,17 +103,20 @@ The most returned item was the travel card wallet, with returns coming from vari
 
 The high return rate for the travel card wallets indicates a potential quality control or design issue. We recommend temporarily pulling this product from shelves and conducting a customer survey to determine the root cause. This will inform a decision on whether to find a new supplier or address the issue internally.
 
--- product
+##Product--------------------------------------------------------------------------------------
 ```
+
 select productname , count(productname) as TopPurchased
 from salestransaction
 group by productname
 ORDER BY TopPurchased DESC;
+-- Finding products and the amount of times it has been purchase to see what are the top prodcuts
 
 select productname , sum(amount) as TopRevenue
 from salestransaction
 group by productname
 ORDER BY TopRevenue DESC;
+-- Finding and suming each product to see how much revenue a product has made 
 ```
 
 -- return
@@ -141,6 +126,7 @@ from salestransaction
 where quantity <= 0
 group by productname
 order by ReturnedAmount desc;
+-- Finding filtering produts that have a negative quanity amount to find the returned items.
 ```
 <img width="1285" height="1025" alt="image" src="https://github.com/user-attachments/assets/71aa44ad-1004-474f-ab0d-7359e4850879" /> 
 
@@ -162,30 +148,39 @@ To further nurture this key segment, we can implement new loyalty programs. Offe
 ```
 Select floor(sum(amount)) as TotalRevenueKPI
 from salestransaction;
+- Caluclating the total revenue the company has made from December of 2018 to December of 2019
+
 
 select COUNT(distinct customerno) as TotalCustomers
 FROM salestransaction;
+- Counting the amount of customers to gage revenue to customer 
+
 
 select productname, sum(quantity) as QuatitySold
 from salestransaction
 group by productname
 order by QuatitySold desc;
+-- Finding products and the amount of times it has been purchase to see what are the top prodcuts
 ```
 
-##GEO--------------------------------------------
+##GEO-----------------------------------------------------------------------------------
 ```
 select country, floor(sum(amount)) as TotalCountryRev
 from salestransaction
 group by country;
+-- Filtering by country in order to see where the companies revenue is coming from 
 
 select country, count(distinct transactionno) as PurchasesPerCon
 from salestransaction
 group by country
 order by PurchasesPerCon desc;
+-- Filtering by country in order to see how many purchases are coming from which country
 ```
 
--- Sales Trends 
+##Sales Trends ----------------------------------------------------------------------
+
 ```
+-- Filtering the data using the where clause to a soecific month to find the monthly revenue
 Select SUM(Total) AS Dec18
 FROM ecom.order_info
 where date between '2018-12-01' AND '2018-12-31';
@@ -239,54 +234,38 @@ FROM ecom.order_info
 where date between '2019-12-01' AND '2019-12-31';
 ```
 
--- Quarter Decemeber
 
+##Quarters-------------------------------------------------------------------
 ```
+-- using a where clause I am able to find specific data from a certain point in time in order to calculate the revenue quarterly
+
+-- Quarter Decemeber
 Select SUM(Total) AS Q0
 FROM ecom.order_info
 where date between '2018-12-01' AND '2018-12-31';
-```
 
 -- Quarter Jan-Mar
-
-```
 Select SUM(Total) AS Q1
 FROM ecom.order_info
 where date between '2019-01-01' AND '2019-03-31';
-```
 
 -- Quarter Apr-Jun
-
-```
 Select SUM(Total) AS Q2
 FROM ecom.order_info
 where date between '2019-04-01' AND '2019-06-30';
-```
 
 -- Quarter Jul-Sep
-
-```
 Select SUM(Total) AS Q3
 FROM ecom.order_info
 where date between '2019-07-01' AND '2019-09-30';
-```
 
 -- Quarter Oct-Dec
-
-```
 Select SUM(Total) AS Q4
 FROM ecom.order_info
 where date between '2019-10-01' AND '2019-12-31';
 ```
 
--- Sales By
 
-```
-select productname , count(productname) as TopSelling
-from salestransaction
-group by productname
-ORDER BY amount DESC;
-```
 
 
 
